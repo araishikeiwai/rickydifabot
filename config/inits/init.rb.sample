@@ -1,0 +1,11 @@
+$telegram_bot_token = 'your_bot_token'
+$redis = Redis.new
+$logger = Logger.new('rickydifa.log', 'weekly')
+SuckerPunch.logger = Logger.new('sucker_punch.log', 'weekly')
+
+$ricky_difa_group = -1
+$ricky = -1
+$difa = -1
+$bot_username = 'rickydifabot'
+
+Cachy.cache_store = $redis
