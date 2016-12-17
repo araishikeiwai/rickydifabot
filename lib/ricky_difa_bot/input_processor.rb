@@ -34,13 +34,14 @@ class RickyDifaBot::InputProcessor
               :long
             end
           RickyDifaBot::GroceryList.instance.send("add_#{type}", item)
-          reply(message, 'Berhasil menambahkan ke /daftar_belanja!')
+          reply(message, 'Berhasil ditambahkan ke /daftar_belanja!')
         rescue
           reply(message, 'Gagal! Salah format?')
         end
       elsif text =~ /^\/hapus (\d+) (\w+)$/i
         begin
           index = $1.to_i - 1
+          return unless index >= 0
           type =
             case $2
             when /cepat/i
@@ -50,8 +51,8 @@ class RickyDifaBot::InputProcessor
             when /pankapan/i
               :long
             end
-          RickyDifaBot::GroceryList.instance.send("remove_#{type}", index)
-          reply(message, 'Berhasil dihapus dari /daftar_belanja!')
+          removed = RickyDifaBot::GroceryList.instance.send("remove_#{type}", index)
+          reply(message, "Berhasil menghapus #{removed} dari /daftar_belanja!") if removed
         rescue
           reply(message, 'Gagal! Salah format?')
         end

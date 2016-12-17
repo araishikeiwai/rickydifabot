@@ -24,9 +24,13 @@ class RickyDifaBot::GroceryList
 
     define_method("remove_#{type}") do |idx|
       arr = send(type)
-      arr.delete_at(idx)
-      send("#{type}=", arr)
-      save
+      removed = arr[idx]
+      if removed
+        arr.delete_at(idx)
+        send("#{type}=", arr)
+        save
+      end
+      removed
     end
   end
 
