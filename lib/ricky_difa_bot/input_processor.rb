@@ -41,21 +41,12 @@ class RickyDifaBot::InputProcessor
         rescue
           reply(message, 'Gagal! Salah format?')
         end
-      elsif text =~ /^\/hapus (\d+) (\w+)$/i
+      elsif text =~ /^\/hapus ((?:\d+ ?)+)$/i
         begin
-          index = $1.to_i - 1
-          return unless index >= 0
-          type =
-            case $2
-            when /cepat/i
-              :short
-            when /ntaran/i
-              :mid
-            when /pankapan/i
-              :long
-            end
-          removed = RickyDifaBot::GroceryList.instance.send("remove_#{type}", index)
-          reply(message, "Berhasil menghapus #{removed} dari /daftar_belanja!") if removed
+          indices = $1.split.map{ |i| i.to_i - 1 }
+          return unless indices.all?{ |i| i >= 0 }
+          removed = RickyDifaBot::GroceryList.instance.remove(indices)
+          reply(message, "Berhasil menghapus\n#{removed}\ndari daftar belanja!. Daftar belanja terbaru:\n\n#{RickyDifaBot::GroceryList.instance.list}") if removed
         rescue
           reply(message, 'Gagal! Salah format?')
         end
