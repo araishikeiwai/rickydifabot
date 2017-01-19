@@ -37,7 +37,7 @@ class RickyDifaBot::InputProcessor
               :long
             end
           RickyDifaBot::GroceryList.instance.send("add_#{type}", item)
-          reply(message, 'Berhasil ditambahkan ke /daftar_belanja!')
+          reply(message, "Berhasil ditambahkan ke /daftar_belanja! Daftar belanja terbaru:\n\n#{RickyDifaBot::GroceryList.instance.list}")
         rescue
           reply(message, 'Gagal! Salah format?')
         end
@@ -46,7 +46,25 @@ class RickyDifaBot::InputProcessor
           indices = $1.split.map{ |i| i.to_i - 1 }
           return unless indices.all?{ |i| i >= 0 }
           removed = RickyDifaBot::GroceryList.instance.remove(indices)
-          reply(message, "Berhasil menghapus\n#{removed}\ndari daftar belanja!. Daftar belanja terbaru:\n\n#{RickyDifaBot::GroceryList.instance.list}") if removed
+          reply(message, "Berhasil menghapus\n#{removed.join("\n")}\ndari daftar belanja! Daftar belanja terbaru:\n\n#{RickyDifaBot::GroceryList.instance.list}") if removed.present?
+        rescue
+          reply(message, 'Gagal! Salah format?')
+        end
+      elsif text =~ /^\/pindah ((?:\d+ ?)+) (\w+)$/i
+        begin
+          indices = $1.split.map{ |i| i.to_i - 1 }
+          type =
+            case $2
+            when /cepat/i
+              :short
+            when /ntaran/i
+              :mid
+            when /pankapan/i
+              :long
+            end
+          return unless indices.all?{ |i| i >= 0 }
+          moved = RickyDifaBot::GroceryList.instance.move(indices, type)
+          reply(message, "Berhasil memindahkan\n#{moved.join("\n")}\nke daftar #{type}-term! Daftar belanja terbaru:\n\n#{RickyDifaBot::GroceryList.instance.list}") if moved.present?
         rescue
           reply(message, 'Gagal! Salah format?')
         end

@@ -49,7 +49,15 @@ class RickyDifaBot::GroceryList
     long.delete_if.with_index{ |_, idx| long_idx.include?(idx) }
     save
 
-    removed.join("\n")
+    removed
+  end
+
+  def move(indices, type)
+    moved = remove(indices)
+    moved.each do |mv|
+      send("add_#{type}", mv)
+    end
+    moved
   end
 
   def list
