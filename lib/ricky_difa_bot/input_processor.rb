@@ -19,7 +19,10 @@ class RickyDifaBot::InputProcessor
     text = message.text.sub("@#{$bot_username}", '')
 
     if in_ricky_difa_group?(message)
-      if text =~ /^\/daftar_belanja$/i
+      if text =~ /^\/reload$/i
+        RickyDifaBot.reload!
+        reply(message, 'Reloaded!')
+      elsif text =~ /^\/daftar_belanja$/i
         reply(message, RickyDifaBot::GroceryList.instance.list)
       elsif text =~ /^\/beli (.+) (\w+)$/i
         begin

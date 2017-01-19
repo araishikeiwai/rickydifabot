@@ -14,4 +14,8 @@ class RickyDifaBot
   def self.log(message)
     RickyDifaBot::RickyDifaLog.perform_async(message)
   end
+
+  def self.reload!
+    Rake::Task['ricky_difa_bot:reload'].execute
+  end
 end
