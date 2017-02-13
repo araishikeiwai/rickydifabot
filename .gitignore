@@ -49,7 +49,8 @@ build-iPhoneSimulator/
 # unless supporting rvm < 1.11.0 or doing something fancy, ignore this:
 .rvmrc
 config/inits/init.rb
+rickydifa.log*
 *.log
 *.swp
-*.swo
+.swo
 *.swn

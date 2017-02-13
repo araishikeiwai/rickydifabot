@@ -24,9 +24,9 @@ class RickyDifaBot::InputProcessor
         reply(message, 'Reloaded!')
       elsif text =~ /^\/daftar_belanja$/i
         reply(message, RickyDifaBot::GroceryList.instance.list)
-      elsif text =~ /^\/beli (.+) (\w+)$/i
+      elsif text =~ /^\/beli((?:.+))+(\b\w+\b)$/im
         begin
-          item = $1
+          items = $1.split("\n").map(&:strip).select(&:present?)
           type =
             case $2
             when /cepat/i
@@ -36,7 +36,7 @@ class RickyDifaBot::InputProcessor
             when /pankapan/i
               :long
             end
-          RickyDifaBot::GroceryList.instance.send("add_#{type}", item)
+          RickyDifaBot::GroceryList.instance.send("add_#{type}", items)
           reply(message, "Berhasil ditambahkan ke /daftar_belanja! Daftar belanja terbaru:\n\n#{RickyDifaBot::GroceryList.instance.list}")
         rescue
           reply(message, 'Gagal! Salah format?')

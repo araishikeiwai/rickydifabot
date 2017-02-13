@@ -13,9 +13,10 @@ class RickyDifaBot::GroceryList
   end
 
   TYPES.each do |type|
-    define_method("add_#{type}") do |item|
+    define_method("add_#{type}") do |item_arr|
       arr = send(type)
-      arr.push(item.downcase)
+      arr.push(item_arr.map(&:downcase))
+      arr.flatten!
       arr.uniq!
       arr.sort!
       send("#{type}=", arr)
@@ -54,9 +55,7 @@ class RickyDifaBot::GroceryList
 
   def move(indices, type)
     moved = remove(indices)
-    moved.each do |mv|
-      send("add_#{type}", mv)
-    end
+    send("add_#{type}", moved)
     moved
   end
 
