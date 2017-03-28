@@ -68,6 +68,11 @@ class RickyDifaBot::InputProcessor
         rescue
           reply(message, 'Gagal! Salah format?')
         end
+      elsif text =~ /^\/ex/i
+        if message.reply_to_message
+          text = message.reply_to_message&.text
+        end
+        RickyDifaBot::ExpenseQueue.add(text)
       end
     end
   end
