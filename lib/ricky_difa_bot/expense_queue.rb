@@ -6,7 +6,7 @@ class RickyDifaBot::ExpenseQueue
   end
 
   def self.add(item)
-    $redis.lpush(KEY, "#{DateTime.now.strftime("%Y-%m-%d %H:%M")}\n#{item}")
+    $redis.rpush(KEY, "#{DateTime.now.strftime("%Y-%m-%d %H:%M")}\n#{item}")
   end
 
   def self.clear
