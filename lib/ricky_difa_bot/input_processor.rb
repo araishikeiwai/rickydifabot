@@ -72,7 +72,8 @@ class RickyDifaBot::InputProcessor
         if message.reply_to_message
           text = message.reply_to_message&.text
         end
-        RickyDifaBot::ExpenseQueue.add(text)
+        RickyDifaBot::ExpenseQueue.add(text.gsub(/\/ex ?/, ''))
+        reply(message, 'Berhasil ditambahkan ke daftar pending')
       end
     end
   end
