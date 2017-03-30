@@ -69,10 +69,12 @@ class RickyDifaBot::InputProcessor
           reply(message, 'Gagal! Salah format?')
         end
       elsif text =~ /^\/ex/i
+        date = message.date
         if message.reply_to_message
           text = message.reply_to_message&.text
+          date = message.reply_to_message&.date
         end
-        RickyDifaBot::ExpenseQueue.add(text.gsub(/\/ex ?/, ''))
+        RickyDifaBot::ExpenseQueue.add(text.gsub(/\/ex ?/, ''), date)
         reply(message, 'Berhasil ditambahkan ke daftar pending')
       end
     end
