@@ -72,6 +72,7 @@ class RickyDifaBot::InputProcessor
         end
       elsif text =~ /#exq/i
         date = message.date
+        puts "HOHOHO"
         if message.reply_to_message
           text = message.reply_to_message&.text
           date = message.reply_to_message&.date
