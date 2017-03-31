@@ -74,8 +74,9 @@ class RickyDifaBot::InputProcessor
           text = message.reply_to_message&.text
           date = message.reply_to_message&.date
         end
-        RickyDifaBot::ExpenseQueue.add(text.gsub(/\/ex ?/, ''), date)
-        reply(message, 'Berhasil ditambahkan ke daftar pending')
+        subbed = text.gsub(/\/ex ?/, '')
+        RickyDifaBot::ExpenseQueue.add(subbed, date)
+        reply(message, "Berhasil menambahkan #{subbed} ke daftar pending")
       end
     end
   end
