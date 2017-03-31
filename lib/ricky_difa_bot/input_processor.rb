@@ -70,13 +70,13 @@ class RickyDifaBot::InputProcessor
         rescue
           reply(message, 'Gagal! Salah format?')
         end
-      elsif text =~ /^\/ex/i
+      elsif text =~ /#exq/i
         date = message.date
         if message.reply_to_message
           text = message.reply_to_message&.text
           date = message.reply_to_message&.date
         end
-        subbed = text.gsub(/\/ex ?/, '')
+        subbed = text.gsub(/ *#exq */, '')
         RickyDifaBot::ExpenseQueue.add(subbed, date)
         reply(message, "Berhasil menambahkan #{subbed} ke daftar pending")
       end
