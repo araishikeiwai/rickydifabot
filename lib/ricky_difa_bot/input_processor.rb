@@ -18,11 +18,13 @@ class RickyDifaBot::InputProcessor
 
     text = message.text.sub("@#{$bot_username}", '')
 
+    if text =~ /^\/reload$/i && message.from.username == 'araishikeiwai'
+      RickyDifaBot.reload!
+      reply(message, 'Reloaded!')
+    end
+
     if in_ricky_difa_group?(message)
-      if text =~ /^\/reload$/i
-        RickyDifaBot.reload!
-        reply(message, 'Reloaded!')
-      elsif text =~ /^\/daftar_belanja$/i
+      if text =~ /^\/daftar_belanja$/i
         reply(message, RickyDifaBot::GroceryList.instance.list)
       elsif text =~ /^\/beli((?:.+))+(\b\w+\b)$/im
         begin
