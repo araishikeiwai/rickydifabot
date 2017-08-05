@@ -1,16 +1,8 @@
 class RickyDifaBot::ExpenseQueue
-  KEY = 'expense_queue'
-
-  def self.list
-    $redis.lrange(KEY, 0, -1)
-  end
+  KEY = 'expense_queue_hash'
 
   def self.add(item, date)
-    time = Time.at(date)
-    $redis.rpush(KEY, "#{time.strftime("%Y-%m-%d %H:%M")}\n#{item}")
-  end
-
-  def self.clear
-    $redis.del(KEY)
+    item = "#{Time.at(date).strftime("%Y-%m-%d %H:%M")}\n#{item}"
+    $redis.hset(KEY, date, item)
   end
 end
