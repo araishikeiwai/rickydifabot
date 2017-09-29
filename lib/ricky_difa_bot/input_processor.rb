@@ -80,6 +80,13 @@ class RickyDifaBot::InputProcessor
         subbed = text.gsub(/ *#exq */, '')
         RickyDifaBot::ExpenseQueue.add(subbed, date)
         reply(message, "Berhasil menambahkan #{subbed} ke daftar pending")
+      elsif text =~ /^\/keyboard$/
+        keyboard = Telegram::Bot::Types::ReplyKeyboardMarkup.new(keyboard: RickyDifaBot::Timeline::KEYBOARDS.keys.map { |command| [command] }, resize_keyboard: true, one_time_keyboard: true, selective: true)
+        reply(message, 'Ya?', reply_markup: keyboard)
+      elsif text.in?(RickyDifaBot::Timeline::KEYBOARDS.keys)
+        command = RickyDifaBot::Timeline::KEYBOARDS[text]
+        RickyDifaBot::Timeline.send("#{command}!", DateTime.now)
+        reply(message, 'OK~')
       end
     end
   end
@@ -94,8 +101,8 @@ class RickyDifaBot::InputProcessor
     message.chat.id == $ricky_difa_group
   end
 
-  def reply(message, text)
-    send(chat_id: message.chat.id, text: text, reply_to_message_id: message.message_id)
+  def reply(message, text, opts = {})
+    send(opts.reverse_merge(chat_id: message.chat.id, text: text, reply_to_message_id: message.message_id))
   end
 
   def send(options = {})
