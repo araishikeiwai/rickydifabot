@@ -83,7 +83,7 @@ class RickyDifaBot::InputProcessor
       elsif text =~ /^\/keyboard$/
         keyboard = Telegram::Bot::Types::ReplyKeyboardMarkup.new(keyboard: RickyDifaBot::Timeline::KEYBOARDS.keys.map { |command| [command] }, resize_keyboard: true, one_time_keyboard: true, selective: true)
         reply(message, 'Ya?', reply_markup: keyboard)
-      elsif text.in?(RickyDifaBot::Timeline::KEYBOARDS.keys)
+      elsif text.in?(RickyDifaBot::Timeline::KEYBOARDS.keys) && message.from.id == $ricky
         command = RickyDifaBot::Timeline::KEYBOARDS[text]
         RickyDifaBot::Timeline.send("#{command}!", DateTime.now)
         reply(message, 'OK~')
