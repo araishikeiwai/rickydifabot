@@ -72,7 +72,6 @@ class RickyDifaBot::InputProcessor
         end
       elsif text =~ /#exq/i
         date = message.date
-        puts "HOHOHO"
         if message.reply_to_message
           text = message.reply_to_message&.text
           date = message.reply_to_message&.date
@@ -81,11 +80,14 @@ class RickyDifaBot::InputProcessor
         RickyDifaBot::ExpenseQueue.add(subbed, date)
         reply(message, "Berhasil menambahkan #{subbed} ke daftar pending")
       elsif text =~ /^\/keyboard$/
-        keyboard = Telegram::Bot::Types::ReplyKeyboardMarkup.new(keyboard: RickyDifaBot::Timeline::KEYBOARDS.keys.map { |command| [command] }, resize_keyboard: true, one_time_keyboard: true, selective: true)
+        keyboard = Telegram::Bot::Types::ReplyKeyboardMarkup.new(keyboard: RickyDifaBot::Timeline::KEYBOARDS.keys.map { |command| [command] } + RickyDifaBot::ExpenseQueue::KEYBOARDS, resize_keyboard: true, one_time_keyboard: true, selective: true)
         reply(message, 'Ya?', reply_markup: keyboard)
       elsif text.in?(RickyDifaBot::Timeline::KEYBOARDS.keys) && message.from.id == $ricky
         command = RickyDifaBot::Timeline::KEYBOARDS[text]
         RickyDifaBot::Timeline.send("#{command}!", DateTime.now)
+        reply(message, 'OK~')
+      elsif text.in?(RickyDifaBot::ExpenseQueue::KEYBOARDS.flatten) && message.from.id == $ricky
+        RickyDifaBot::ExpenseQueue.add(text, DateTime.now.to_i)
         reply(message, 'OK~')
       end
     end
