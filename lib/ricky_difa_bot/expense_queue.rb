@@ -3,7 +3,6 @@ class RickyDifaBot::ExpenseQueue
 
   KEYBOARDS = [
     ['T65R', 'T65T'],
-    ['T9R', 'T9T'],
     ['T95R', 'T95T'],
     ['T16R', 'T16T']
   ]
