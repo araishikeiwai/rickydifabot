@@ -4,8 +4,10 @@ class RickyDifaBot::ExpenseQueue
   KEYBOARDS = [
     [
       ['T65R', 'T65T'],
+      ['T7R', 'T7T'],
       ['T95R', 'T95T'],
-      ['T16R', 'T16T']
+      ['T16R', 'T16T'],
+      ['T165R', 'T165T']
     ],
     [
       ['Busway Flazz'],
