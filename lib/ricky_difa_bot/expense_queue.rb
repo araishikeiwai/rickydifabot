@@ -10,8 +10,8 @@ class RickyDifaBot::ExpenseQueue
       ['T165R', 'T165T']
     ],
     [
-      ['Busway Flazz'],
-      ['Busway Tapcash']
+      ['Busway Flazz', 'KAI Flazz'],
+      ['Busway Tapcash', 'KAI Tapcash']
     ]
   ]
 
