@@ -26,6 +26,37 @@ class RickyDifaBot::InputProcessor
     if in_ricky_difa_group?(message)
       if text =~ /^\/daftar_belanja$/i
         reply(message, RickyDifaBot::GroceryList.instance.list)
+      elsif text =~ /^\/lihat_list/
+        res = ['Daftar To-Do List']
+        res << ''
+        RickyDifaBot::ToDoList.order_by(id_int: :asc).each do |list|
+          res << "id ##{list.id_int}: #{list.name}"
+          res << "#{list.list.size} kategori, #{list.list.values.flatten.size} entri"
+          res << "Lihat di /lihat_#{list.id_int}"
+          res << ''
+        end
+        reply(message, res.join("\n"))
+      elsif text =~ /^\/lihat_(\d+)/
+        list = RickyDifaBot::ToDoList.find_by(id_int: $1.to_i)
+        return unless list
+        reply(message, list.to_s)
+      elsif text =~ /^\/do (\d+) (.+) (.+)/
+        id_int = $1.to_i
+        entry = $2
+        sublist = $3
+        list = RickyDifaBot::ToDoList.find_by(id_int: id_int)
+        return unless list
+        if list.add([entry], sublist)
+          reply(message, "Berhasil ditambahkan!\n\n#{list}")
+        end
+      elsif text =~ /^\/done (\d+) (\d+)/
+        id_int = $1.to_i
+        indices = $2.to_i - 1
+        list = RickyDifaBot::ToDoList.find_by(id_int: id_int)
+        return unless list
+        if removed = list.remove([indices])
+          reply(message, "Berhasil menghapus\n#{removed.join("\n")}\ndari to do list ini!\n\n#{list}")
+        end
       elsif text =~ /^\/beli((?:.+))+(\b\w+\b)$/im
         begin
           items = $1.split("\n").map(&:strip).select(&:present?)
