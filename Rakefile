@@ -6,6 +6,7 @@ require 'telegram/bot'
 require 'sucker_punch'
 require 'active_support/all'
 require 'cachy'
+require 'pry'
 
 def reload!
   Dir[File.dirname(__FILE__) + '/config/inits/*.rb'].each{ |file| load file }

@@ -18,6 +18,7 @@ GEM
     builder (3.2.2)
     cachy (0.4.1)
       mini_memory_store
+    coderay (1.1.2)
     coercible (1.0.0)
       descendants_tracker (~> 0.0.1)
     concurrent-ruby (1.0.1)
@@ -31,6 +32,7 @@ GEM
     json (1.8.3)
     mail (2.6.4)
       mime-types (>= 1.16, < 4)
+    method_source (0.9.0)
     mime-types (3.1)
       mime-types-data (~> 3.2015)
     mime-types-data (3.2016.0521)
@@ -51,6 +53,9 @@ GEM
       mongoid-compatibility
     multipart-post (2.0.0)
     origin (2.2.0)
+    pry (0.11.3)
+      coderay (~> 1.1.0)
+      method_source (~> 0.9.0)
     rake (11.1.2)
     redis (3.2.2)
     sucker_punch (2.0.1)
@@ -75,7 +80,11 @@ DEPENDENCIES
   mail
   mongoid
   mongoid-locker
+  pry
   rake
   redis
   sucker_punch (~> 2.0)
   telegram-bot-ruby
+
+BUNDLED WITH
+   1.16.0

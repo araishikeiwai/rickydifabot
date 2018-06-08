@@ -24,38 +24,86 @@ class RickyDifaBot::InputProcessor
     end
 
     if in_ricky_difa_group?(message)
-      if text =~ /^\/daftar_belanja$/i
+      if text =~ /^\/daftar[_ ]belanja$/i
         reply(message, RickyDifaBot::GroceryList.instance.list)
-      elsif text =~ /^\/lihat_list/
+      elsif text =~ /^\/lihat[_ ]list/
         res = ['Daftar To-Do List']
         res << ''
         RickyDifaBot::ToDoList.order_by(id_int: :asc).each do |list|
-          res << "id ##{list.id_int}: #{list.name}"
-          res << "#{list.list.size} kategori, #{list.list.values.flatten.size} entri"
+          res << "(##{list.id_int}) #{list.name}"
+          res << "#{list.sublist_count} kategori, #{list.contents_count} entri"
           res << "Lihat di /lihat_#{list.id_int}"
           res << ''
         end
         reply(message, res.join("\n"))
-      elsif text =~ /^\/lihat_(\d+)/
+      elsif text =~ /^\/lihat[_ ](\d+)/
         list = RickyDifaBot::ToDoList.find_by(id_int: $1.to_i)
         return unless list
         reply(message, list.to_s)
-      elsif text =~ /^\/do (\d+) (.+) (.+)/
-        id_int = $1.to_i
-        entry = $2
-        sublist = $3
-        list = RickyDifaBot::ToDoList.find_by(id_int: id_int)
+      elsif text =~ /^\/buat[_ ]list (.+)/
+        name = $1
+        status =
+          if RickyDifaBot::ToDoList.create(name: name)
+            'Berhasil'
+          else
+            'Gagal'
+          end
+        reply(message, "#{status} menambahkan #{name} sebagai To-Do List baru!\n\n/lihat_list")
+      elsif text =~ /^\/hapus[_ ]list (\d+)/
+        list = RickyDifaBot::ToDoList.find_by(id_int: $1.to_i)
         return unless list
-        if list.add([entry], sublist)
-          reply(message, "Berhasil ditambahkan!\n\n#{list}")
+        name = list.name
+        status =
+          if list.destroy
+            'Berhasil'
+          else
+            'Gagal'
+          end
+        reply(message, "#{status} menghapus #{name} dari daftar To-Do List!\n\n/lihat_list")
+      elsif text =~ /^\/tambah[_ ]kategori (\d+) (.+)/
+        list = RickyDifaBot::ToDoList.find_by(id_int: $1.to_i)
+        return unless list
+        sublist = $2
+        if list.add_sublist(sublist)
+          reply(message, "Berhasil menambahkan #{sublist} sebagai kategori baru!\n\n#{list}")
+        else
+          reply(message, "Gagal menambahkan #{sublist} sebagai kategori baru!")
         end
-      elsif text =~ /^\/done (\d+) (\d+)/
+      elsif text =~ /^\/hapus[_ ]kategori (\d+) (\d+)/
+        list = RickyDifaBot::ToDoList.find_by(id_int: $1.to_i)
+        return unless list
+        sublist = nil
+        status =
+          if sublist = list.remove_sublist($2.to_i)
+            'Berhasil'
+          else
+            'Gagal'
+          end
+        reply(message, "#{status} menghapus #{sublist} dari To-Do List ini!\n\n#{list}")
+      elsif text =~ /^\/done (\d+) ((?:\d+\.\d+ ?)+)/
         id_int = $1.to_i
-        indices = $2.to_i - 1
+        indices = $2.split
         list = RickyDifaBot::ToDoList.find_by(id_int: id_int)
         return unless list
-        if removed = list.remove([indices])
-          reply(message, "Berhasil menghapus\n#{removed.join("\n")}\ndari to do list ini!\n\n#{list}")
+        removed = []
+        indices.group_by do |idx|
+          idx.split('.').first.to_i
+        end.each do |title_idx, contents|
+          content_indices = contents.map { |c| c.split('.').last.to_i }
+          if tmp = list.remove(title_idx, content_indices)
+            removed << tmp.join(', ')
+          end
+        end
+        reply(message, "Berhasil menghapus\n#{removed.join("\n")}\ndari to do list ini!\n\n#{list}")
+      elsif text =~ /^\/do((?:.+))+\b(\d+) (\d+)\b/im
+        items = $1.split("\n").map(&:strip).select(&:present?)
+        id_int = $2&.to_i
+        sublist_idx = $3&.to_i
+        return unless id_int && sublist_idx
+        list = RickyDifaBot::ToDoList.find_by(id_int: id_int)
+        return unless list
+        if list.add([items], sublist_idx)
+          reply(message, "Berhasil ditambahkan!\n\n#{list}")
         end
       elsif text =~ /^\/beli((?:.+))+(\b\w+\b)$/im
         begin

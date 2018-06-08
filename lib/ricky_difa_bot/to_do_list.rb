@@ -4,7 +4,7 @@ class RickyDifaBot::ToDoList
 
   field :id_int, type: Integer
   field :name, type: String
-  field :list, type: Hash, default: {}
+  field :list, type: Array, default: [[' ']]
 
   validates_uniqueness_of :id_int
 
@@ -12,63 +12,61 @@ class RickyDifaBot::ToDoList
 
   before_validation :name_and_id, on: :create
 
-  DEFAULT_SUBLIST = '000-default'
-
-  def add(items, sublist)
-    sublist ||= DEFAULT_SUBLIST
-    sublist.downcase!
-    list[sublist] ||= []
-    list[sublist] << items.map(&:downcase)
-    list[sublist] = list[sublist].flatten.uniq.sort
+  def add(items, idx)
+    title, *content = self.list[idx]
+    content << items.flatten.map(&:downcase)
+    content = content.flatten.uniq.sort
+    self.list[idx] = [title, content].flatten
     save
-  rescue
-    false
   end
 
-  def remove(indices)
-    keys_count = list.map { |k, v| v.size.times.map { |i| "#{k}::#{i}" } }.flatten.sort
-
-    indices = indices.group_by { |idx| keys_count[idx].split('::')[0] }
-    dup_list = list.deep_dup
-
-    removed = []
-    emptied_keys = []
-    indices.each do |sublist, idxs|
-      idxs.each do |idx|
-        internal_index = keys_count[idx].split('::')[1].to_i
-        removed << dup_list[sublist][internal_index]
-        # WRONG LOGIC FOR MULTIPLE INDICES
-        list[sublist].delete_at(internal_index)
-        emptied_keys << sublist if list[sublist].size == 0
-      end
-    end
-
-    list.except!(*emptied_keys)
+  def remove(title_idx, content_indices)
+    return if content_indices.include?(0)
+    removed = self.list[title_idx].each_with_index.map { |content, idx| idx.in?(content_indices) && content || nil }.compact
+    self.list[title_idx] = self.list[title_idx].each_with_index.reject { |_content, idx| idx.in?(content_indices) }.map { |content, idx| content }
     save
     removed
   end
 
-  def move(indices, sublist)
-    moved = remove(indices)
-    add(moved, sublist)
-    moved
+  def add_sublist(sublist)
+    sublist.downcase!
+    return if self.list.any? { |old_sublist, *content| old_sublist == sublist }
+    new_list = self.list
+    new_list[new_list.size] = [sublist]
+    self.list = new_list.sort_by { |title, *content| title }
+    save
+  end
+
+  def remove_sublist(sublist_idx)
+    return if sublist_idx == 0
+    removed = self.list[sublist_idx].first
+    self.list.delete_at(sublist_idx)
+    save
+    removed
+  end
+
+  def sublist_count
+    list.size
+  end
+
+  def contents_count
+    list.sum { |title, *content| content.size }
   end
 
   def to_s
-    Cachy.cache(:ricky_difa_bot, :to_do_list, name, updated_at) do
-      res = ["id ##{id_int}: #{name}"]
+    #Cachy.cache(:ricky_difa_bot, :to_do_list, name, updated_at) do
+      res = ["(##{id_int}) #{name}"]
       res << ''
-      idx = 0
-      list.keys.sort.each do |sublist|
-        res << sublist unless sublist == DEFAULT_SUBLIST
-        list[sublist].each_with_index do |item|
-          res << "#{idx + 1}. #{item}"
-          idx += 1
+      list.each_with_index do |sublist, idx|
+        res << "(#{idx}) #{sublist.first}"
+        sublist.each_with_index do |content, content_idx|
+          next if content_idx == 0
+          res << "#{idx}.#{content_idx} #{content}"
         end
         res << ''
       end
       res.join("\n")
-    end
+    #end
   end
 
   private
