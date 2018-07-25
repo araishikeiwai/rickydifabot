@@ -3,6 +3,6 @@ production:
     default:
       database: rickydifabot
       hosts:
-        - localhost:27017
+        - 10.136.53.117:27017
   options:
     raise_not_found_error: false
