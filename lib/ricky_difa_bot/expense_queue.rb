@@ -16,6 +16,9 @@ class RickyDifaBot::ExpenseQueue
   ]
 
   def self.add(item, date)
+    while $redis.hget(KEY, date).present?
+      date += 1
+    end
     item = "#{Time.at(date).strftime("%Y-%m-%d %H:%M")}\n#{item}"
     $redis.hset(KEY, date, item)
   end
