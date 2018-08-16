@@ -13,5 +13,7 @@ CSV.foreach('pending.csv') do |row|
   text << row[8]
   text << "totx #{row[10]}"
 
-  RickyDifaBot::ExpenseQueue.add(text.join("\n"), dt.to_i)
+  text = text.join("\n")
+  RickyDifaBot::ExpenseQueue.add(text, dt.to_i)
+  puts "Added!\n#{text}\n=========================================="
 end
