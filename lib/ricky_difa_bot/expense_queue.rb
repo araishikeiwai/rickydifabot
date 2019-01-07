@@ -15,6 +15,7 @@ class RickyDifaBot::ExpenseQueue
     ],
     [
       ['Busway Flazz', 'KAI Flazz'],
+      ['Busway E-money', 'KAI E-money'],
       ['Busway Tapcash', 'KAI Tapcash']
     ]
   ]
