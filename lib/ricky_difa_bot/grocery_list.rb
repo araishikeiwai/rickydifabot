@@ -2,7 +2,7 @@ class RickyDifaBot::GroceryList
   include Mongoid::Document
   include Mongoid::Timestamps
 
-  TYPES = [:short, :mid, :long]
+  TYPES = [:short, :shmid, :mid, :long]
 
   TYPES.each do |type|
     field type, type: Array, default: []
@@ -37,15 +37,18 @@ class RickyDifaBot::GroceryList
 
   def remove(indices)
     short_idx = indices.select{ |idx| idx < short.size }
-    mid_idx = indices.select{ |idx| idx >= short.size && idx < short.size + mid.size }.map{ |idx| idx - short.size }
-    long_idx = indices.select{ |idx| idx >= short.size + mid.size && idx < short.size + mid.size + long.size }.map{ |idx| idx - short.size - mid.size }
+    shmid_idx = indices.select{ |idx| idx >= short.size && idx < short.size + shmid.size }.map{ |idx| idx - short.size }
+    mid_idx = indices.select{ |idx| idx >= short.size + shmid.size && idx < short.size + shmid.size + mid.size }.map{ |idx| idx - short.size - shmid.size }
+    long_idx = indices.select{ |idx| idx >= short.size + shmid.size + mid.size && idx < short.size + shmid.size + mid.size + long.size }.map{ |idx| idx - short.size - shmid.size - mid.size }
 
     removed = []
     removed += short_idx.map{ |idx| short[idx] }
+    removed += shmid_idx.map{ |idx| shmid[idx] }
     removed += mid_idx.map{ |idx| mid[idx] }
     removed += long_idx.map{ |idx| long[idx] }
 
     short.delete_if.with_index{ |_, idx| short_idx.include?(idx) }
+    shmid.delete_if.with_index{ |_, idx| shmid_idx.include?(idx) }
     mid.delete_if.with_index{ |_, idx| mid_idx.include?(idx) }
     long.delete_if.with_index{ |_, idx| long_idx.include?(idx) }
     save

@@ -112,6 +112,8 @@ class RickyDifaBot::InputProcessor
             case $2
             when /cepat/i
               :short
+            when /soon/i
+              :shmid
             when /ntaran/i
               :mid
             when /pankapan/i
@@ -138,6 +140,8 @@ class RickyDifaBot::InputProcessor
             case $2
             when /cepat/i
               :short
+            when /soon/i
+              :shmid
             when /ntaran/i
               :mid
             when /pankapan/i
