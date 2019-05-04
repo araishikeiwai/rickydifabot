@@ -6,6 +6,7 @@ class RickyDifaBot::ExpenseQueue
       ['T45R', 'T45T'],
       ['T65R', 'T65T'],
       ['T7R', 'T7T'],
+      ['T75R', 'T75T'],
       ['T95R', 'T95T'],
       ['T15R', 'T15T'],
       ['T16R', 'T16T'],
