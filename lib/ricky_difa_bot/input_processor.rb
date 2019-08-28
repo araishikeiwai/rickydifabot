@@ -176,7 +176,8 @@ class RickyDifaBot::InputProcessor
         RickyDifaBot::Timeline.send("#{command}!", DateTime.now)
         reply(message, 'OK~')
       elsif text.in?(RickyDifaBot::ExpenseQueue::KEYBOARDS.flatten)
-        RickyDifaBot::ExpenseQueue.add(text, DateTime.now.to_i)
+        date = message.date
+        RickyDifaBot::ExpenseQueue.add(text, date)
         reply(message, 'OK~')
       end
     end
