@@ -41,6 +41,9 @@ class RickyDifaBot::Timeline
       fields.except('_id', 'date').keys.each do |action|
         if time = tl.send(action)
           time = Time.at(time)
+          if time.year < 2020
+            time = time.in_time_zone('Jakarta')
+          end
           print << time.hour
           print << ":"
           print << time.min
