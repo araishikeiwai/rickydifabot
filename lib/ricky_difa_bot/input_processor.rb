@@ -30,6 +30,12 @@ class RickyDifaBot::InputProcessor
         reply(message, RickyDifaBot::ExpenseManager.budgets(month: $1.to_i))
       elsif text =~ /budget/i
         reply(message, RickyDifaBot::ExpenseManager.budgets)
+      elsif text == 'Accounts'
+        reply(message, RickyDifaBot::ExpenseManager.accounts)
+      elsif text =~ /\/mutations_(\d+)/
+        reply(message, RickyDifaBot::ExpenseManager.mutations(account_id: $1))
+      elsif text =~ /\/mutations/
+        reply(message, RickyDifaBot::ExpenseManager.mutations)
       elsif text =~ /^\/daftar[_ ]belanja$/i
         reply(message, RickyDifaBot::GroceryList.instance.list)
       elsif text =~ /^\/lihat[_ ]list/

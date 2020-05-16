@@ -1,25 +1,64 @@
 class RickyDifaBot::ExpenseManager
   BUDGETS = $gql.parse <<-gql
-      query($year: Int!, $month: Int!) {
-        budgets(year: $year, month: $month) {
-          owner {
-            name
-          }
-          label
-          amountUsed {
-            formatted
-          }
-          amountTotal {
-            formatted
-          }
-          amountRemaining {
-            formatted
-          }
+    query($year: Int!, $month: Int!) {
+      budgets(year: $year, month: $month) {
+        owner {
+          name
+        }
+        label
+        amountUsed {
+          formatted
+        }
+        amountTotal {
+          formatted
+        }
+        amountRemaining {
+          formatted
         }
       }
+    }
+  gql
+
+  MUTATIONS = $gql.parse <<-gql
+    query($accountId: ID, $first: Int) {
+      mutations(accountId: $accountId, first: $first) {
+        nodes {
+          datetime
+          amount {
+            formatted
+          }
+          aite {
+            name
+          }
+          category {
+            slug
+          }
+          account {
+            slug
+          } 
+          type
+        }
+      }
+    }
+  gql
+
+  ACCOUNTS = $gql.parse <<-gql
+    query {
+      accounts {
+        id
+        currency
+        form
+        slug
+        balance {
+          raw
+          formatted
+        }
+      }
+    }
   gql
 
   KEYBOARDS = [
+    ['Accounts'],
     ['Remaining Budget']
   ]
 
@@ -52,6 +91,43 @@ class RickyDifaBot::ExpenseManager
       end
 
       res.join("\n")
+    end
+
+    def mutations(account_id: nil)
+      resp = $gql.query(MUTATIONS, variables: { accountId: account_id, first: 10 })
+
+      res = []
+      res << "Last 10 mutations"
+      res << ""
+      resp.data.mutations.nodes.each do |mutation|
+        tmp = "#{DateTime.parse(mutation.datetime).strftime("%b/%d")}: <b>#{mutation.amount.formatted}</b>"
+        tmp += " in #{mutation.account.slug}" unless account_id
+        tmp += " to #{mutation.aite.name}" if mutation.type == 'ExpenseManager::Debit'
+        tmp += " from #{mutation.aite.name}" if mutation.type == 'ExpenseManager::Credit'
+        tmp += " for #{mutation.category.slug}"
+        res << tmp
+      end
+      res.join("\n")
+    end
+
+    def accounts
+      resp = $gql.query(ACCOUNTS)
+
+      res = []
+      res << "List of accounts"
+      res << ""
+      resp.data.accounts.each do |account|
+        next unless whitelist?(account)
+        res << "<b>#{account.balance.formatted}</b> #{account.slug} /mutations_#{account.id}"
+      end
+      res.join("\n")
+    end
+
+    private
+
+    def  whitelist?(account)
+      account.currency.in?(['CAD']) ||
+        account.slug == 'Ricky-USD:E-Money:Virtual'
     end
   end
 end
