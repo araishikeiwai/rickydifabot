@@ -24,7 +24,13 @@ class RickyDifaBot::InputProcessor
     end
 
     if in_ricky_difa_group?(message)
-      if text =~ /^\/daftar[_ ]belanja$/i
+      if text =~ /budget +(\d{4}) +(\d{1,2})/i
+        reply(message, RickyDifaBot::ExpenseManager.budgets(year: $1.to_i, month: $2.to_i))
+      elsif text =~ /budget +(\d{1,2})/i
+        reply(message, RickyDifaBot::ExpenseManager.budgets(month: $1.to_i))
+      elsif text =~ /budget/i
+        reply(message, RickyDifaBot::ExpenseManager.budgets)
+      elsif text =~ /^\/daftar[_ ]belanja$/i
         reply(message, RickyDifaBot::GroceryList.instance.list)
       elsif text =~ /^\/lihat[_ ]list/
         res = ['Daftar To-Do List']
@@ -166,9 +172,9 @@ class RickyDifaBot::InputProcessor
         keyboard =
           case message.from.id
           when $ricky
-            Telegram::Bot::Types::ReplyKeyboardMarkup.new(keyboard: RickyDifaBot::Timeline::KEYBOARDS.keys.map { |command| [command] } + RickyDifaBot::ExpenseQueue::KEYBOARDS[0], resize_keyboard: true, one_time_keyboard: true, selective: true)
+            Telegram::Bot::Types::ReplyKeyboardMarkup.new(keyboard: RickyDifaBot::Timeline::KEYBOARDS.keys.map { |command| [command] } + RickyDifaBot::ExpenseManager::KEYBOARDS, resize_keyboard: true, one_time_keyboard: true, selective: true)
           when $difa
-            Telegram::Bot::Types::ReplyKeyboardMarkup.new(keyboard: RickyDifaBot::ExpenseQueue::KEYBOARDS[1] + RickyDifaBot::ExpenseQueue::KEYBOARDS[0].map { |kb| [kb[1]] }, resize_keyboard: true, one_time_keyboard: true, selective: true)
+            Telegram::Bot::Types::ReplyKeyboardMarkup.new(keyboard: RickyDifaBot::ExpenseManager::KEYBOARDS, resize_keyboard: true, one_time_keyboard: true, selective: true)
           end
         reply(message, 'Ya?', reply_markup: keyboard)
       elsif text.in?(RickyDifaBot::Timeline::KEYBOARDS.keys) && message.from.id == $ricky
@@ -190,7 +196,7 @@ class RickyDifaBot::InputProcessor
   end
 
   def in_ricky_difa_group?(message)
-    message.chat.id == $ricky_difa_group
+    message.chat.id == $ricky_difa_group || $local_test
   end
 
   def reply(message, text, opts = {})

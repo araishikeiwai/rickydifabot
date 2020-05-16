@@ -9,3 +9,5 @@ $difa = -1
 $bot_username = 'rickydifabot'
 
 Cachy.cache_store = $redis
+$gql_url = 'http://localhost:3000'
+$auth_token = 'Basic token'
