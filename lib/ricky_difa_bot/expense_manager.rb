@@ -2,6 +2,7 @@ class RickyDifaBot::ExpenseManager
   BUDGETS = $gql.parse <<-gql
     query($year: Int!, $month: Int!) {
       budgets(year: $year, month: $month) {
+        id
         owner {
           name
         }
@@ -20,8 +21,8 @@ class RickyDifaBot::ExpenseManager
   gql
 
   MUTATIONS = $gql.parse <<-gql
-    query($accountId: ID, $first: Int) {
-      mutations(accountId: $accountId, first: $first) {
+    query($accountId: ID, $budgetId: ID, $first: Int) {
+      mutations(accountId: $accountId, budgetId: $budgetId, first: $first) {
         nodes {
           datetime
           amount {
@@ -84,17 +85,20 @@ class RickyDifaBot::ExpenseManager
       res << ""
       resp.data.budgets.each do |budget|
         if current
-          res << "#{budget.owner.name[0]}/#{budget.label}: <b>#{budget.amount_remaining.formatted}</b> (#{budget.amount_total.formatted})"
+          res << "#{budget.owner.name[0]}/#{budget.label}: <b>#{budget.amount_remaining.formatted}</b> (#{budget.amount_total.formatted}) /mtx_b#{budget.id}"
         else
-          res << "#{budget.owner.name[0]}/#{budget.label}: #{budget.amount_remaining.formatted} + #{budget.amount_used.formatted} (#{budget.amount_total.formatted})"
+          res << "#{budget.owner.name[0]}/#{budget.label}: #{budget.amount_remaining.formatted} + #{budget.amount_used.formatted} (#{budget.amount_total.formatted}) /mtx_b#{budget.id}"
         end
       end
+
+      res << ""
+      res << "See more: https://araishikeiwai.com/expense_manager/budgets?month=#{month}&year=#{year}"
 
       res.join("\n")
     end
 
-    def mutations(account_id: nil)
-      resp = $gql.query(MUTATIONS, variables: { accountId: account_id, first: 10 })
+    def mutations(account_id: nil, budget_id: nil)
+      resp = $gql.query(MUTATIONS, variables: { accountId: account_id, budgetId: budget_id, first: 10 })
 
       res = []
       res << "Last 10 mutations"
@@ -107,6 +111,13 @@ class RickyDifaBot::ExpenseManager
         tmp += " for #{mutation.category.slug}"
         res << tmp
       end
+
+      res << ""
+      url = 'https://araishikeiwai.com/expense_manager/mutations?tabular_view=true'
+      url += "&account_id=#{account_id}" if account_id
+      url += "&budget_id=#{budget_id}" if budget_id
+      res << "See more: #{url}"
+
       res.join("\n")
     end
 
@@ -118,7 +129,7 @@ class RickyDifaBot::ExpenseManager
       res << ""
       resp.data.accounts.each do |account|
         next unless whitelist?(account)
-        res << "<b>#{account.balance.formatted}</b> #{account.slug} /mutations_#{account.id}"
+        res << "<b>#{account.balance.formatted}</b> #{account.slug} /mtx_a#{account.id}"
       end
       res.join("\n")
     end
