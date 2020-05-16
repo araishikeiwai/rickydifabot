@@ -45,9 +45,9 @@ class RickyDifaBot::ExpenseManager
       res << ""
       resp.data.budgets.each do |budget|
         if current
-          res << "#{budget.owner.name}/#{budget.label}: #{budget.amount_remaining.formatted} (#{budget.amount_total.formatted})"
+          res << "#{budget.owner.name[0]}/#{budget.label}: <b>#{budget.amount_remaining.formatted}</b> (#{budget.amount_total.formatted})"
         else
-          res << "#{budget.owner.name}/#{budget.label}: #{budget.amount_remaining.formatted} + #{budget.amount_used.formatted} (#{budget.amount_total.formatted})"
+          res << "#{budget.owner.name[0]}/#{budget.label}: #{budget.amount_remaining.formatted} + #{budget.amount_used.formatted} (#{budget.amount_total.formatted})"
         end
       end
 
