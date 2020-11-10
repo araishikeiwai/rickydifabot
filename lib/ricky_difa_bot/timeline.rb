@@ -60,6 +60,8 @@ class RickyDifaBot::Timeline
           time = Time.at(time)
           if time.year < 2020
             time = time.in_time_zone('Jakarta')
+          else
+            time = time.in_time_zone('America/New_York')
           end
           print << time.hour
           print << ":"
