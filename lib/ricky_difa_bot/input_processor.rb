@@ -24,7 +24,9 @@ class RickyDifaBot::InputProcessor
     end
 
     if in_ricky_difa_group?(message)
-      if text =~ /budget +(\d{4}) +(\d{1,2})/i
+      if text =~ /fuel c(\d{3}) p(\d{3}) (\d+)l/i
+        reply(message, calculate_fuel(costco: $1.to_f / 10, petro: $2.to_f / 10, vol: $3.to_i))
+      elsif text =~ /budget +(\d{4}) +(\d{1,2})/i
         reply(message, RickyDifaBot::ExpenseManager.budgets(year: $1.to_i, month: $2.to_i))
       elsif text =~ /budget +(\d{1,2})/i
         reply(message, RickyDifaBot::ExpenseManager.budgets(month: $1.to_i))
@@ -211,5 +213,23 @@ class RickyDifaBot::InputProcessor
 
   def send(options = {})
     RickyDifaBot::MessageSender.perform_async(@bot, options)
+  end
+
+  def calculate_fuel(costco:, petro:, vol:)
+    cprice = vol * costco * 0.99
+    pprice = vol * (((petro - 3) * 0.99) - 1.2)
+    cprice /= 100
+    pprice /= 100
+    distance_diff = 0.5
+    cprice += distance_diff
+
+    ret = []
+    ret << "Final price at Costco: $#{"%.2f" % cprice}"
+    ret << "Final price at PetCan: $#{"%.2f" % pprice}"
+    ret << ''
+    cheaper = pprice < cprice ? 'PetCan' : 'Costco'
+    diffperc = (pprice - cprice).abs * 100 / [pprice, cprice].max
+    ret << "#{cheaper} is cheaper by #{"%.2f" % diffperc}%"
+    ret.join("\n")
   end
 end
