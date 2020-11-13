@@ -24,7 +24,7 @@ class RickyDifaBot::InputProcessor
     end
 
     if in_ricky_difa_group?(message)
-      if text =~ /fuel c(\d{3}) p(\d{3}) (\d+)l/i
+      if text =~ /fuel c(\d{3,4}) p(\d{3,4}) (\d+)l/i
         reply(message, calculate_fuel(costco: $1.to_f / 10, petro: $2.to_f / 10, vol: $3.to_i))
       elsif text =~ /budget +(\d{4}) +(\d{1,2})/i
         reply(message, RickyDifaBot::ExpenseManager.budgets(year: $1.to_i, month: $2.to_i))
