@@ -220,7 +220,7 @@ class RickyDifaBot::InputProcessor
     pprice = vol * (((petro - 3) * 0.99) - 1.2)
     cprice /= 100
     pprice /= 100
-    distance_diff = 0.5
+    distance_diff = 0.6 # home to costco - home to petcan
     cprice += distance_diff
 
     ret = []
