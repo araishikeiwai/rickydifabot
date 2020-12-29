@@ -177,13 +177,14 @@ class RickyDifaBot::InputProcessor
         RickyDifaBot::ExpenseQueue.add(subbed, date)
         reply(message, "Berhasil menambahkan #{subbed} ke daftar pending")
       elsif text =~ /^\/keyboard$/
-        keyboard =
-          case message.from.id
-          when $ricky
-            Telegram::Bot::Types::ReplyKeyboardMarkup.new(keyboard: RickyDifaBot::Timeline::KEYBOARDS.keys.map { |command| [command] } + RickyDifaBot::ExpenseManager::KEYBOARDS, resize_keyboard: true, one_time_keyboard: true, selective: true)
-          when $difa
-            Telegram::Bot::Types::ReplyKeyboardMarkup.new(keyboard: RickyDifaBot::ExpenseManager::KEYBOARDS, resize_keyboard: true, one_time_keyboard: true, selective: true)
-          end
+        # keyboard =
+        #   case message.from.id
+        #   when $ricky
+        #     Telegram::Bot::Types::ReplyKeyboardMarkup.new(keyboard: RickyDifaBot::Timeline::KEYBOARDS.keys.map { |command| [command] } + RickyDifaBot::ExpenseManager::KEYBOARDS, resize_keyboard: true, one_time_keyboard: true, selective: true)
+        #   when $difa
+        #     Telegram::Bot::Types::ReplyKeyboardMarkup.new(keyboard: RickyDifaBot::ExpenseManager::KEYBOARDS, resize_keyboard: true, one_time_keyboard: true, selective: true)
+        #   end
+        keyboard = Telegram::Bot::Types::ReplyKeyboardMarkup.new(keyboard: RickyDifaBot::ExpenseManager::KEYBOARDS, resize_keyboard: true, one_time_keyboard: true, selective: true)
         reply(message, 'Ya?', reply_markup: keyboard)
       elsif text.in?(RickyDifaBot::Timeline::KEYBOARDS.keys) && message.from.id == $ricky
         command = RickyDifaBot::Timeline::KEYBOARDS[text]
