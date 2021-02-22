@@ -184,7 +184,7 @@ class RickyDifaBot::InputProcessor
         #   when $difa
         #     Telegram::Bot::Types::ReplyKeyboardMarkup.new(keyboard: RickyDifaBot::ExpenseManager::KEYBOARDS, resize_keyboard: true, one_time_keyboard: true, selective: true)
         #   end
-        keyboard = Telegram::Bot::Types::ReplyKeyboardMarkup.new(keyboard: RickyDifaBot::ExpenseManager::KEYBOARDS, resize_keyboard: true, one_time_keyboard: true, selective: true)
+        keyboard = Telegram::Bot::Types::ReplyKeyboardMarkup.new(keyboard: RickyDifaBot::KEYBOARDS, resize_keyboard: true, one_time_keyboard: true, selective: true)
         reply(message, 'Ya?', reply_markup: keyboard)
       elsif text.in?(RickyDifaBot::Timeline::KEYBOARDS.keys) && message.from.id == $ricky
         command = RickyDifaBot::Timeline::KEYBOARDS[text]

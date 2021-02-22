@@ -58,11 +58,6 @@ class RickyDifaBot::ExpenseManager
     }
   gql
 
-  KEYBOARDS = [
-    ['Accounts'],
-    ['Remaining Budget']
-  ]
-
   class << self
     def budgets(year: nil, month: nil)
       month ||= DateTime.now.month
